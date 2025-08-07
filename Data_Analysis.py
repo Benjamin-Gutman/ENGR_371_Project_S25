@@ -10,11 +10,11 @@ def convertAttendance(attendance):
         phrase = Quant_Attendance[i]
         if phrase == "Always":
             Quant_Attendance[i] = 5
-        else if phrase == "Often":
+        elif phrase == "Often":
             Quant_Attendance[i] = 4
-        else if phrase == "Sometimes":
+        elif phrase == "Sometimes":
             Quant_Attendance = 3
-        else if phrase == "Rarely":
+        elif phrase == "Rarely":
             Quant_Attendance[i] = 2
         else:
             Quant_Attendance[i] = 1
@@ -23,17 +23,17 @@ def convertAttendance(attendance):
 
 def convertHours(asdf):
     Quant_Hours = np.array(asdf)
-    for i in len(attendance):
+    for i in len(asdf):
         phrase = Quant_Hours[i]
         if phrase == "0-4":
             Quant_Hours[i] = 2.5
-        else if phrase == "5-8":
+        elif phrase == "5-8":
             Quant_Hours[i] = 6.5
-        else if phrase == "9-12":
+        elif phrase == "9-12":
             Quant_Hours[i] = 10.5
-        else if phrase == "13-16":
+        elif phrase == "13-16":
             Quant_Hours[i] = 14.5
-        else if phrase == "17-20":
+        elif phrase == "17-20":
             Quant_Hours[i] = 18.5
         else:
             Quant_Hours[i] = 22.5
@@ -50,7 +50,8 @@ def StatFinder(asdf):
     sampleVar = sampleVar/(len(asdf)-1)
     return mean, sampleVar
 
+df = pd.read_excel(file_name)
 
+array = pd.Dataframe.to_numpy(df)
 
-    
-
+print(array)
