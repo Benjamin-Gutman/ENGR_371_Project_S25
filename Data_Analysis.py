@@ -1,9 +1,11 @@
 import pandas as pd
 import matplotlib as mpt
 import matplotlib.pyplot as plt
+import math
+from scipy import stats
 import numpy as np
 
-plt.ion()
+
 
 file_name = 'responses2.xlsx'
 
@@ -28,21 +30,21 @@ def convertGpa(gpa):
     for i in range(len(gpa)):
         phrase = Quant_Gpa[i]
         if phrase == "0-1.99":
-            Quant_Gpa[i] = 0
+            Quant_Gpa[i] = 0.995
         elif phrase == "2.0-2.29":
-            Quant_Gpa[i] = 1
+            Quant_Gpa[i] = 2.145
         elif phrase == "2.3-2.69":
-            Quant_Gpa[i] = 2
+            Quant_Gpa[i] = 2.495
         elif phrase == "2.7-2.99":
-            Quant_Gpa[i] = 3
+            Quant_Gpa[i] = 2.845
         elif phrase == "3.0-3.29":
-            Quant_Gpa[i] = 4
+            Quant_Gpa[i] = 3.145
         elif phrase == "3.3-3.69":
-            Quant_Gpa[i] = 5
+            Quant_Gpa[i] = 3.495
         elif phrase == "3.7-3.99":
-            Quant_Gpa[i] = 6
+            Quant_Gpa[i] = 3.845
         else:
-            Quant_Gpa[i] = 7
+            Quant_Gpa[i] = 4.15
     return Quant_Gpa
 
 
@@ -93,14 +95,29 @@ def StatFinder(asdf):
 def barGraphCreater(data,xname, yname, graphTitle):
     unique, count = np.unique(data, return_counts = True)
     plt.figure()
-    labels = ["0-1.99", "2.0-2.29", "2.3-2.69", "2.7-2.99", "3.0-3.29", "3.3-3.69", "3.7-3.99", "4.0"]
-    plt.bar(unique, count, width=0.5)
+    labels = ["2.3-2.69", "2.7-2.99", "3.0-3.29", "3.3-3.69", "3.7-3.99", "4.0+"]
+    plt.bar(unique, count, width=0.15)
     plt.title(graphTitle)
     plt.xlabel(xname)
     plt.ylabel(yname)
+    plt.xticks(unique, labels)
+
+def f_test(var1,var2,pop1,pop2):
+    if var1>var2:
+        f_stat = var1/var2
+        bigger = pop1-1
+        smaller = pop2-1
+    else:
+        f_stat = var2/var1
+        bigger = pop2-1
+        smaller = pop1-1
+    p_value = 2*(1- stats.f.cdf(f_stat, bigger, smaller))
+    return f_stat, p_value
 
 
-
+def poolVariance(var1,var2, n1,n2):
+    varPool = ((n1-1)*var1+(n2-1)*var2)/(n1+n2-2)
+    return varPool
 
 df = pd.read_excel(file_name)
 
@@ -124,9 +141,9 @@ plt.show()
 
 underStudy, underGpa, overStudy, overGpa =arraySeparator(study, gpa, 14.5)
 
-#barGraphCreater(underGpa)
+barGraphCreater(underGpa, "Grade Point Average", "Number of People", "GPA Distribution of Students with Hours Studied Under '13-16'")
 
-#barGraphCreater(overGpa)
+barGraphCreater(overGpa, "Grade Point Average", "Number of People", "GPA Distribution of Students with Hours Studied Over '13-16'")
 
 print(StatFinder(underStudy))
 print(StatFinder(underGpa))
@@ -134,15 +151,51 @@ print(StatFinder(underGpa))
 print(StatFinder(overStudy))
 print(StatFinder(overGpa))
 
+uGPA, uVar = StatFinder(underGpa)
+
+oGPA, oVar = StatFinder(overGpa)
+
+
+print(f_test(uVar,oVar, len(underGpa), len(overGpa)))
+
+
+var = poolVariance(uVar, oVar, len(underGpa), len(overGpa))
+print(len(underGpa))
+
+print(var)
+
+print((stats.ttest_ind(underGpa, overGpa, equal_var=True)))
+
+
+
+
 
 underAttendance, underGpa, overAttendance, overGpa =arraySeparator(attendance, gpa, 4)
 
 barGraphCreater(underGpa, "Grade Point Average", "Number of People", "GPA Distribution of Students with Attendance Less Than 'Often'")
 
-#barGraphCreater(overGpa)
+barGraphCreater(overGpa, "Grade Point Average", "Number of People", "GPA Distribution of Students with Attendance More Than 'Often'")
 
 print(StatFinder(underAttendance))
 print(StatFinder(underGpa))
 
 print(StatFinder(overAttendance))
 print(StatFinder(overGpa))
+
+uGPA, uVar = StatFinder(underGpa)
+
+oGPA, oVar = StatFinder(overGpa)
+
+
+
+print(f_test(uVar,oVar, len(underGpa), len(overGpa)))
+
+
+var = poolVariance(uVar, oVar, len(underGpa), len(overGpa))
+
+print(len(underGpa))
+
+print(var)
+print((stats.ttest_ind(underGpa, overGpa, equal_var=True)))
+
+
